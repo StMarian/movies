@@ -7,6 +7,16 @@ using Polly.Extensions.Http;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(builder =>
+	{
+		builder.WithOrigins("http://localhost:5173", "http://localhost:5174")
+			.AllowAnyHeader()
+			.AllowAnyMethod();
+	});
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -42,6 +52,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
+app.UseCors();
 app.MapControllers();
 
 app.Run();
