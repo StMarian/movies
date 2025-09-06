@@ -11,7 +11,7 @@ builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(builder =>
 	{
-		builder.WithOrigins("http://localhost:5173", "http://localhost:5174")
+		builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000")
 			.AllowAnyHeader()
 			.AllowAnyMethod();
 	});
@@ -51,7 +51,6 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.UseAuthorization();
 app.UseCors();
 app.MapControllers();
 

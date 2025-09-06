@@ -2,7 +2,7 @@ import axios from "axios";
 import { MovieSummary } from "../models/MovieSummary";
 import { MovieDetail } from "../models/MovieDetail";
 
-const api = axios.create({ baseURL: "http://localhost:5188" });
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
 export const getMovies = async (): Promise<MovieSummary[]> => {
   const res = await api.get("/movies");
