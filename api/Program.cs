@@ -1,6 +1,8 @@
 using Backend.Mappers;
 using Backend.Models;
 using Backend.Services;
+using Polly;
+using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,8 @@ builder.Services.Configure<FeedSettings>(
 builder.Services.AddHttpClient<FeedService>(client =>
 {
 	client.Timeout = TimeSpan.FromSeconds(30);
-});
+})
+.AddPolicyHandler(GetRetryPolicy());
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(cfg =>
@@ -42,3 +45,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Simple single retry policy for transient HTTP errors
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+	return HttpPolicyExtensions
+		.HandleTransientHttpError()
+		.RetryAsync(1);
+}
