@@ -2,7 +2,12 @@ using System.Collections.Concurrent;
 
 namespace Backend.Services
 {
-	public class ImageCacheService(HttpClient httpClient)
+	public interface IImageCacheService
+	{
+		ValueTask<byte[]?> GetOrDownloadAsync(string hash, string originalUrl);
+	}
+
+	public class ImageCacheService(HttpClient httpClient) : IImageCacheService
 	{
 		private readonly ConcurrentDictionary<string, byte[]?> _cache = new();
 		private readonly ConcurrentDictionary<string, Lazy<Task<byte[]?>>> _currentDownloads = new();

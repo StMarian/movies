@@ -1,6 +1,6 @@
 ﻿namespace Backend.Services
 {
-	public class FeedInitializer(FeedService feedService, ILogger<FeedInitializer> logger) : IHostedService
+	public class FeedInitializer(IFeedService feedService, ILogger<FeedInitializer> logger) : IHostedService
 	{
 		public async Task StartAsync(CancellationToken cancellationToken)
 		{

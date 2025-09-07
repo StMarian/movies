@@ -5,7 +5,7 @@ using Backend.Services;
 
 namespace Backend.Mappers
 {
-	public class ImageHashResolver(ImageHashService hashService) : IValueResolver<Image, ImageDto, string>
+	public class ImageHashResolver(IImageHashService hashService) : IValueResolver<Image, ImageDto, string>
 	{
 		public string Resolve(Image source, ImageDto destination, string destMember, ResolutionContext context)
 		{

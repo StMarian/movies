@@ -42,9 +42,9 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 // Register services
-builder.Services.AddSingleton<FeedService>();
-builder.Services.AddSingleton<ImageHashService>();
-builder.Services.AddSingleton<ImageCacheService>();
+builder.Services.AddSingleton<IFeedService, FeedService>();
+builder.Services.AddSingleton<IImageHashService, ImageHashService>();
+builder.Services.AddSingleton<IImageCacheService, ImageCacheService>();
 builder.Services.AddTransient<ImageHashResolver>();
 builder.Services.AddHostedService<FeedInitializer>();
 

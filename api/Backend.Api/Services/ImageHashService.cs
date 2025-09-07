@@ -2,7 +2,13 @@
 
 namespace Backend.Services
 {
-	public class ImageHashService
+	public interface IImageHashService
+	{
+		string ComputeAndStoreHash(string url);
+		string? GetUrlFromHash(string hash);
+	}
+
+	public class ImageHashService : IImageHashService
 	{
 		private readonly ConcurrentDictionary<string, string> _hashToUrlMap = new();
 

@@ -5,13 +5,19 @@ using Microsoft.Extensions.Options;
 
 namespace Backend.Services
 {
-	public class FeedService(HttpClient httpClient, IMapper mapper, IOptions<FeedSettings> settings)
+	public interface IFeedService
 	{
-		private static List<Movie>? _feedCache;
+		ValueTask<List<MovieSummaryDto>> GetMovieSummariesAsync();
+		ValueTask<MovieDetailDto?> GetMovieDetailAsync(string id);
+	}
+
+	public class FeedService(HttpClient httpClient, IMapper mapper, IOptions<FeedSettings> settings) : IFeedService
+	{
+		private List<Movie>? _feedCache;
 		private List<MovieSummaryDto>? _summaryCache;
 		private Dictionary<string, MovieDetailDto>? _detailCache;
 
-		private static readonly SemaphoreSlim _feedSemaphore = new(1, 1);
+		private readonly SemaphoreSlim _feedSemaphore = new(1, 1);
 		private readonly SemaphoreSlim _summarySemaphore = new(1, 1);
 		private readonly SemaphoreSlim _detailSemaphore = new(1, 1);
 
@@ -34,6 +40,11 @@ namespace Backend.Services
 				_summaryCache = [.. movies.Select(mapper.Map<MovieSummaryDto>)];
 
 				return _summaryCache;
+			}
+			catch
+			{
+				_summaryCache = [];
+				throw;
 			}
 			finally
 			{

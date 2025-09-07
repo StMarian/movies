@@ -6,8 +6,8 @@ namespace Backend.Controllers
 	[ApiController]
 	[Route("images")]
 	public class ImagesController(
-		ImageHashService hashService,
-		ImageCacheService imageCacheService,
+		IImageHashService hashService,
+		IImageCacheService imageCacheService,
 		FeedService feedService) : ControllerBase
 	{
 		[HttpGet("{hash}")]
