@@ -5,7 +5,7 @@ namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("movies")]
-	public class MoviesController(FeedService feedService) : ControllerBase
+	public class MoviesController(IFeedService feedService) : ControllerBase
 	{
 		[HttpGet]
 		public async Task<IActionResult> Get()

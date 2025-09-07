@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace Backend.Services
@@ -7,7 +8,7 @@ namespace Backend.Services
 		ValueTask<byte[]?> GetOrDownloadAsync(string hash, string originalUrl);
 	}
 
-	public class ImageCacheService(HttpClient httpClient) : IImageCacheService
+	public class ImageCacheService(ILogger<ImageCacheService> logger, HttpClient httpClient) : IImageCacheService
 	{
 		private readonly ConcurrentDictionary<string, byte[]?> _cache = new();
 		private readonly ConcurrentDictionary<string, Lazy<Task<byte[]?>>> _currentDownloads = new();
@@ -24,6 +25,8 @@ namespace Backend.Services
 				{
 					try
 					{
+						logger.LogInformation("Downloading image for hash {Hash}", hash);
+
 						var bytes = await httpClient.GetByteArrayAsync(originalUrl);
 
 						_cache[hash] = bytes;

@@ -8,7 +8,7 @@ namespace Backend.Controllers
 	public class ImagesController(
 		IImageHashService hashService,
 		IImageCacheService imageCacheService,
-		FeedService feedService) : ControllerBase
+		IFeedService feedService) : ControllerBase
 	{
 		[HttpGet("{hash}")]
 		[ResponseCache(Duration = 86400)]

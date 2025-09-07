@@ -1,16 +1,26 @@
 import { MovieDetail as MovieDetailType } from "../models/MovieDetail";
 import { getImageUrl, getMovieImageUrl } from "../api/imageUrl";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import placeholderImage from "../assets/placeholder-no-image.jpg";
 import "./MovieDetail.css";
 
 export default function MovieDetail({ movie }: { movie: MovieDetailType }) {
-  const [cardImageSources, setCardImageSources] = useState<string[]>(
-    movie.cardImages.map(img => getImageUrl(img.hash))
+  // Memoize the initial image sources to prevent unnecessary re-processing
+  const initialCardImageSources = useMemo(() => 
+    movie.cardImages.map(img => getImageUrl(img.hash)),
+    [movie.cardImages]
   );
-  const [keyArtImageSources, setKeyArtImageSources] = useState<string[]>(
-    movie.keyArtImages?.map(img => getImageUrl(img.hash)) || []
+  
+  const initialKeyArtImageSources = useMemo(() => 
+    movie.keyArtImages?.map(img => getImageUrl(img.hash)) || [],
+    [movie.keyArtImages]
   );
+
+  const [cardImageSources, setCardImageSources] = useState<string[]>(initialCardImageSources);
+  const [keyArtImageSources, setKeyArtImageSources] = useState<string[]>(initialKeyArtImageSources);
+
+  // For the main poster image, make sure we have same image as in MovieCard
+  const [posterImageSrc, setPosterImageSrc] = useState<string>(getMovieImageUrl(movie.id));
 
   // Handle image error by updating the specific image source to the placeholder
   const handleCardImageError = (index: number) => {
@@ -29,8 +39,21 @@ export default function MovieDetail({ movie }: { movie: MovieDetailType }) {
     });
   };
 
-  // For the main poster image, make sure we have same image as in MovieCard
-  const [posterImageSrc, setPosterImageSrc] = useState<string>(getMovieImageUrl(movie.id));
+  const renderImage = (
+    src: string, 
+    alt: string, 
+    onError: () => void
+  ) => {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onError={onError}
+        className="gallery-image"
+      />
+    );
+  };
 
   return (
     <div className="movie-detail">
@@ -42,6 +65,7 @@ export default function MovieDetail({ movie }: { movie: MovieDetailType }) {
             height={450}
             alt={`${movie.headline} - Poster`}
             onError={() => setPosterImageSrc(placeholderImage)}
+            className="poster-image"
           />
         </div>
         
@@ -54,15 +78,15 @@ export default function MovieDetail({ movie }: { movie: MovieDetailType }) {
                 {Math.floor(movie.duration / 60)}h {movie.duration % 60}m
               </span>
             )}
-            {movie.cert && (
-              <span className="certificate">
-                {movie.cert}
-              </span>
-            )}
+            {movie.cert && <span className="certificate">{movie.cert}</span>}
             <span className="rating">★ {movie.rating}</span>
           </div>
           
-          {movie.genres && <p className="genres"><strong>Genres:</strong> {movie.genres.join(", ")}</p>}
+          {movie.genres?.length > 0 && (
+            <p className="genres">
+              <strong>Genres:</strong> {movie.genres.join(", ")}
+            </p>
+          )}
           
           {movie.synopsis && (
             <div className="synopsis">
@@ -101,14 +125,14 @@ export default function MovieDetail({ movie }: { movie: MovieDetailType }) {
       )}
       
       <div className="movie-credits">
-        {movie.cast && movie.cast.length > 0 && (
+        {movie.cast?.length > 0 && (
           <div className="cast">
             <h2 className="section-heading">Cast</h2>
             <p>{movie.cast.map(c => c.name).join(", ")}</p>
           </div>
         )}
         
-        {movie.directors && movie.directors.length > 0 && (
+        {movie.directors?.length > 0 && (
           <div className="directors">
             <h2 className="section-heading">Directors</h2>
             <p>{movie.directors.map(d => d.name).join(", ")}</p>
@@ -119,41 +143,45 @@ export default function MovieDetail({ movie }: { movie: MovieDetailType }) {
       <div className="images-section">
         <h2 className="images-heading">Movie Images</h2>
         
-        {movie.keyArtImages && movie.keyArtImages.length > 1 && (
+        {movie.keyArtImages?.length > 0 && (
           <div className="keyart-images">
             <h3 className="section-heading">Key Art Images</h3>
             <div className="image-gallery">
-              {movie.keyArtImages.slice(1).map((img, index) => (
-                <div key={index} className="image-card">
-                  <img
-                    src={keyArtImageSources[index + 1] || keyArtImageSources[index]}
-                    width={img.width}
-                    height={img.height}
-                    alt={`${movie.headline} - Key Art ${index + 1}`}
-                    loading="lazy"
-                    onError={() => handleKeyArtImageError(index + 1)}
-                  />
-                </div>
-              ))}
+              {movie.keyArtImages.map((_img, index) => {                
+                return (
+                  <div key={index} className="image-card">
+                    {renderImage(
+                      keyArtImageSources[index] || placeholderImage,
+                      `${movie.headline} - Key Art ${index}`,
+                      () => handleKeyArtImageError(index)
+                    )}
+                  </div>
+                );
+              }).filter(Boolean)}
             </div>
           </div>
         )}
         
-        <h3 className="section-heading">Card Images</h3>
-        <div className="image-gallery">
-          {movie.cardImages.map((img, index) => (
-            <div key={index} className="image-card">
-              <img
-                src={cardImageSources[index]}
-                width={img.width}
-                height={img.height}
-                alt={`${movie.headline} - Image ${index + 1}`}
-                loading="lazy"
-                onError={() => handleCardImageError(index)}
-              />
+        {movie.cardImages.length > 0 && (
+          <>
+            <h3 className="section-heading">Card Images</h3>
+            <div className="image-gallery">
+              {movie.cardImages.map((_img, index) => (
+                <div key={index} className="image-card">
+                  {renderImage(
+                    cardImageSources[index] || placeholderImage,
+                    `${movie.headline} - Image ${index + 1}`,
+                    () => handleCardImageError(index)
+                  )}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
+        
+        {movie.cardImages.length === 0 && movie.keyArtImages?.length === 0 && (
+          <p className="no-images">No additional images available</p>
+        )}
       </div>
     </div>
   );
