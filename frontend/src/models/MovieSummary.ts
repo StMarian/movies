@@ -3,5 +3,5 @@ export interface MovieSummary {
   headline: string;
   year: string;
   rating: number;
-  image: { url: string; w: number; h: number };
+  cardImages: { hash: string; width: number; height: number }[];
 }

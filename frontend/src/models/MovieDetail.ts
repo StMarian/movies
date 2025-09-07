@@ -8,7 +8,7 @@ export interface MovieDetail {
   rating: number;
   cast: { name: string }[];
   directors: { name: string }[];
-  cardImages: { url: string; w: number; h: number }[];
-  keyArtImages: { url: string; w: number; h: number }[];
+  cardImages: { hash: string; width: number; height: number }[];
+  keyArtImages: { hash: string; width: number; height: number }[];
   viewingWindow?: { startDate: string; endDate: string; wayToWatch: string };
 }

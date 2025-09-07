@@ -7,6 +7,6 @@
 		public string Year { get; set; } = string.Empty;
 		public int Rating { get; set; }
 
-		public ImageDto Image { get; set; } = new();
+		public List<ImageDto> CardImages { get; set; } = new();
 	}
 }

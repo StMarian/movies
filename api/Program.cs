@@ -29,8 +29,11 @@ builder.Services.Configure<FeedSettings>(
 builder.Services.AddHttpClient<FeedService>(client =>
 {
 	client.Timeout = TimeSpan.FromSeconds(30);
-})
-.AddPolicyHandler(GetRetryPolicy());
+}).AddPolicyHandler(GetRetryPolicy());
+builder.Services.AddHttpClient<ImageCacheService>(client =>
+{
+	client.Timeout = TimeSpan.FromSeconds(30);
+}).AddPolicyHandler(GetRetryPolicy());
 
 // Configure AutoMapper
 builder.Services.AddAutoMapper(cfg =>
@@ -40,6 +43,9 @@ builder.Services.AddAutoMapper(cfg =>
 
 // Register services
 builder.Services.AddSingleton<FeedService>();
+builder.Services.AddSingleton<HashService>();
+builder.Services.AddSingleton<ImageCacheService>();
+builder.Services.AddTransient<ImageHashResolver>();
 builder.Services.AddHostedService<FeedInitializer>();
 
 var app = builder.Build();
