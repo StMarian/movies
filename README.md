@@ -27,6 +27,6 @@ To make this backend solution scalable I would:
 
 ## CI/CD
 
-Add CI pipeline that would run tests.
+Add CI pipeline that would build artifacts and run tests.
 
-Once decided where to host the solution - setup IaaS and a CD pipeline.
+Once decided where to host the app - setup IaaS and a CD pipeline.
