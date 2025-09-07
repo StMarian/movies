@@ -1,17 +1,21 @@
 using Backend.Services;
 using Backend.Tests.MockHelpers;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using System.Net;
 
 namespace Backend.Tests.Services
 {
 	public partial class ImageCacheServiceTests
 	{
+		private readonly ILogger<ImageCacheService> _logger = Substitute.For<ILogger<ImageCacheService>>();
+
 		[Fact]
 		public async Task GetOrDownloadAsync_ReturnsImageBytesAndCaches()
 		{
 			var imageBytes = new byte[] { 1, 2, 3 };
 			var httpClient = MockHttpMessageHandler.CreateMockHttpClient(HttpStatusCode.OK, imageBytes);
-			var service = new ImageCacheService(httpClient);
+			var service = new ImageCacheService(_logger, httpClient);
 			var hash = "hash1";
 			var url = "https://example.com/image.jpg";
 
@@ -26,7 +30,7 @@ namespace Backend.Tests.Services
 		public async Task GetOrDownloadAsync_FailedDownloadCachesNull()
 		{
 			var httpClient = MockHttpMessageHandler.CreateMockHttpClient(HttpStatusCode.NotFound, null);
-			var service = new ImageCacheService(httpClient);
+			var service = new ImageCacheService(_logger, httpClient);
 			var hash = "hash2";
 			var url = "https://example.com/missing.jpg";
 
@@ -46,7 +50,7 @@ namespace Backend.Tests.Services
 				(HttpStatusCode.OK, imageBytes1),
 				(HttpStatusCode.OK, imageBytes2),
 			]);
-			var service = new ImageCacheService(httpClient);
+			var service = new ImageCacheService(_logger, httpClient);
 
 			var hash1 = "hashA";
 			var hash2 = "hashB";

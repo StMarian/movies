@@ -1,4 +1,5 @@
 using Backend.Mappers;
+using Backend.Middleware;
 using Backend.Models;
 using Backend.Services;
 using Polly;
@@ -56,6 +57,8 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+app.UseExceptionHandlingMiddleware();
 
 app.UseCors();
 app.MapControllers();
