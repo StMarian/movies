@@ -5,10 +5,13 @@ namespace Backend.Controllers
 {
 	[ApiController]
 	[Route("images")]
-	public class ImagesController(HashService hashService, ImageCacheService imageCacheService) : ControllerBase
+	public class ImagesController(
+		HashService hashService,
+		ImageCacheService imageCacheService,
+		FeedService feedService) : ControllerBase
 	{
 		[HttpGet("{hash}")]
-		[ResponseCache(Duration = 86400)] // 24 hours client-side caching
+		[ResponseCache(Duration = 86400)]
 		public async Task<IActionResult> GetImage(string hash)
 		{
 			var originalUrl = hashService.GetUrlFromHash(hash);
@@ -25,15 +28,42 @@ namespace Backend.Controllers
 					return NotFound("Image could not be retrieved");
 				}
 
-				// Determine content type based on URL extension
 				var contentType = GetContentTypeFromUrl(originalUrl);
-
 				return File(bytes, contentType);
 			}
 			catch (HttpRequestException)
 			{
 				return NotFound("Image could not be retrieved");
 			}
+		}
+
+		[HttpGet("for-movie/{movieId}")]
+		[ResponseCache(Duration = 86400)]
+		public async Task<IActionResult> GetFirstAvailableImageForMovie(string movieId)
+		{
+			var movie = await feedService.GetMovieDetailAsync(movieId);
+			if (movie == null)
+			{
+				return NotFound("Movie not found");
+			}
+
+			foreach (var image in movie.CardImages)
+			{
+				var originalUrl = hashService.GetUrlFromHash(image.Hash);
+				if (originalUrl == null)
+				{
+					return NotFound("Image hash not found");
+				}
+
+				var bytes = await imageCacheService.GetOrDownloadAsync(image.Hash, originalUrl);
+				if (bytes != null && bytes.Length > 0)
+				{
+					var contentType = GetContentTypeFromUrl(originalUrl);
+					return File(bytes, contentType);
+				}
+			}
+
+			return NotFound("No available images could be retrieved");
 		}
 
 		private static string GetContentTypeFromUrl(string url)
