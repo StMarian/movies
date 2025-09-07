@@ -14,7 +14,8 @@ namespace Backend.Mappers
 				.ForMember(dest => dest.Height, opt => opt.MapFrom(src => src.Height))
 				.ForMember(dest => dest.Width, opt => opt.MapFrom(src => src.Width));
 
-			CreateMap<Person, PersonDto>();
+			CreateMap<Person, PersonDto>()
+				.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name.SanitizeText()));
 			CreateMap<Video, VideoDto>();
 			CreateMap<ViewingWindow, ViewingWindowDto>();
 			CreateMap<Video, VideoDto>();
