@@ -11,4 +11,13 @@ export interface MovieDetail {
   cardImages: { hash: string; width: number; height: number }[];
   keyArtImages: { hash: string; width: number; height: number }[];
   viewingWindow?: { startDate: string; endDate: string; wayToWatch: string };
+  
+  // Additional fields from backend MovieDetailDto
+  year?: string;
+  cert?: string;
+  quote?: string;
+  reviewAuthor?: string;
+  skyGoId?: string;
+  skyGoUrl?: string;
+  sum?: string;
 }
