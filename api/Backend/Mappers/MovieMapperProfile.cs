@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Backend.Models;
 using Backend.Models.DTO;
+using Backend.Utils;
 
 namespace Backend.Mappers
 {
@@ -19,8 +20,14 @@ namespace Backend.Mappers
 			CreateMap<Video, VideoDto>();
 			CreateMap<VideoAlternative, VideoAlternativeDto>();
 
-			CreateMap<Movie, MovieSummaryDto>();
-			CreateMap<Movie, MovieDetailDto>();
+			CreateMap<Movie, MovieSummaryDto>()
+				.ForMember(dest => dest.Headline, opt => opt.MapFrom(src => src.Headline.SanitizeText()));
+
+			CreateMap<Movie, MovieDetailDto>()
+				.ForMember(dest => dest.Body, opt => opt.MapFrom(src => src.Body.SanitizeText()))
+				.ForMember(dest => dest.Synopsis, opt => opt.MapFrom(src => src.Synopsis.SanitizeText()))
+				.ForMember(dest => dest.Headline, opt => opt.MapFrom(src => src.Headline.SanitizeText()))
+				.ForMember(dest => dest.Quote, opt => opt.MapFrom(src => src.Quote.SanitizeText()));
 		}
 	}
 }
