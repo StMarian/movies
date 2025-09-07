@@ -2,7 +2,7 @@
 
 namespace Backend.Services
 {
-	public class HashService
+	public class ImageHashService
 	{
 		private readonly ConcurrentDictionary<string, string> _hashToUrlMap = new();
 

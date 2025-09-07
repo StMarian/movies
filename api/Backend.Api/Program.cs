@@ -43,7 +43,7 @@ builder.Services.AddAutoMapper(cfg =>
 
 // Register services
 builder.Services.AddSingleton<FeedService>();
-builder.Services.AddSingleton<HashService>();
+builder.Services.AddSingleton<ImageHashService>();
 builder.Services.AddSingleton<ImageCacheService>();
 builder.Services.AddTransient<ImageHashResolver>();
 builder.Services.AddHostedService<FeedInitializer>();
